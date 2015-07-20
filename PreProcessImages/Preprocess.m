@@ -1,4 +1,4 @@
-function[Columns,Rows,ImMeanFinal,Ga,Angle,Change,ImMax]=Preprocess(basepathScase,filesS)
+function[Columns,Rows,ImMeanFinal,Ga,Angle,Change,ImMax,IntCorrection]=Preprocess(basepathScase,filesS)
 %% get mean and std images from strobe
 Im=imread([basepathScase,char(filesS(1))]);     % read initial image for paramneters
 H=size(Im,1);                                 % find height of single image
@@ -11,6 +11,9 @@ ImStd=std(ImStack,[],3);
 disp('Mean image')
 ImMean=mean(ImStack,3);
 ImMax=max(ImStack,[],3);
+ImMeanA= mean(mean(mean(ImStack(:,:,1:2:end-1))));
+ImMeanB= mean(mean(mean(ImStack(:,:,2:2:end))));
+IntCorrection=ImMeanA/ImMeanB;
 clear ImStack
 %% get min image for laser
 % for l=1:length(filesL)                          

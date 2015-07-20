@@ -1,4 +1,4 @@
-% clear;clc;
+clear;clc;
 addpath('C:\Users\localadmin\Documents\MATLAB\PIV\PreProcessing\PreProcessImages')          % path of sub-functions etc.
 basepathS='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Str\';     % path for raw strobe images
 % basepathL='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Las\';     % path for laser images
@@ -6,7 +6,7 @@ writepath='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Processed'
 cd(basepathS)
 cases=struct2cell(dir);                             % get a list of the file names
 cases=cases(1,3:end);
-for i=1%:length(cases)                               % for each case
+parfor i=1:length(cases)                               % for each case
     disp(['Case ', num2str(i)])
     basepathScase=[basepathS,char(cases(i)),'\'];   % Build list of strobe images
     cd(basepathScase)
@@ -17,11 +17,11 @@ for i=1%:length(cases)                               % for each case
 %     filesL=struct2cell(dir);
 %     filesL=filesL(1,3:end);
     disp('Locate and Mask')
-%     [Columns,Rows,ImMeanF,Ga,Angle,Change]=Preprocess(basepathScase,filesS);
+    [Columns,Rows,ImMeanF,Ga,Angle,Change,ImMax,IntCorrection]=Preprocess(basepathScase,filesS);
     disp('Write files')
     % save mean image
     if isdir([writepath,'\Mean\'])==0;mkdir([writepath,'\Mean\']);end
-    ImMeanFR=fliplr(imresize(ImMeanF,84/77)); % resize to diameter of 84 pixels
+    ImMeanFR=fliplr(imresize(ImMeanF,800/787)); % resize to diameter of 84 pixels
     imwrite(uint16(ImMeanFR),[writepath,'\Mean\',char(cases(i)),'_mean.tif'])
     
     % save individual images
@@ -40,16 +40,17 @@ for i=1%:length(cases)                               % for each case
 %         ImLA=ImL(1:H,:);ImLB=ImL(H+1:end,:);
              %% correct images
         ImS=ImS./Ga;               % correct strobe for illumination
+        if mod(j,2)==0; ImS=ImS*InCorrection;end            
 %         ImLA=ImLA-LasImMin;ImLB=ImLB-LasImMin;      % subtract minimium imagefrom laser
         % rotate images, crop excess 
-        ImS=imrotate(ImS,Angle,'bicubic');ImS=ImS(Change+31:end-Change-31,Change+1:end-Change);
+        ImS=imrotate(ImS,Angle,'bicubic','crop');ImS=ImS(Change+1:end-Change-1,Change+1:end-Change);
 %         ImLA=imrotate(ImLA,Angle,'bicubic');ImLA=ImLA(Change+1:end-Change,Change+1:end-Change);
 %         ImLB=imrotate(ImLB,Angle,'bicubic');ImLB=ImLB(Change+1:end-Change,Change+1:end-Change);
         %% Crop to region
         ImS=ImS(Columns,Rows);
 %         ImLA=ImLA(Columns,Rows);ImLB=ImLB(Columns,Rows);
         %% resize
-        ImSr=imresize(ImS,84/77);
+        ImSr=imresize(ImS,800/787);
 %         ImLAr=imresize(ImLA,84/77);ImLBr=imresize(ImLB,84/77);
         
         ImSwrite=fliplr([ImSr]);
