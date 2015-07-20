@@ -6,7 +6,7 @@ writepath='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Processed'
 cd(basepathS)
 cases=struct2cell(dir);                             % get a list of the file names
 cases=cases(1,3:end);
-parfor i=1:length(cases)                               % for each case
+for i=1:length(cases)                               % for each case
     disp(['Case ', num2str(i)])
     basepathScase=[basepathS,char(cases(i)),'\'];   % Build list of strobe images
     cd(basepathScase)
@@ -22,7 +22,9 @@ parfor i=1:length(cases)                               % for each case
     % save mean image
     if isdir([writepath,'\Mean\'])==0;mkdir([writepath,'\Mean\']);end
     ImMeanFR=fliplr(imresize(ImMeanF,800/787)); % resize to diameter of 84 pixels
+    ImMaxFR=fliplr(imresize(ImMax,800/787));
     imwrite(uint16(ImMeanFR),[writepath,'\Mean\',char(cases(i)),'_mean.tif'])
+    imwrite(uint16(ImMax),[writepath,'\Mean\',char(cases(i)),'_max.tif'])
     
     % save individual images
 %     if isdir([writepath,'\Las\'])==0;mkdir([writepath,'\Las\']);end
@@ -40,7 +42,7 @@ parfor i=1:length(cases)                               % for each case
 %         ImLA=ImL(1:H,:);ImLB=ImL(H+1:end,:);
              %% correct images
         ImS=ImS./Ga;               % correct strobe for illumination
-        if mod(j,2)==0; ImS=ImS*InCorrection;end            
+        if mod(j,2)==0; ImS=ImS*IntCorrection;end            
 %         ImLA=ImLA-LasImMin;ImLB=ImLB-LasImMin;      % subtract minimium imagefrom laser
         % rotate images, crop excess 
         ImS=imrotate(ImS,Angle,'bicubic','crop');ImS=ImS(Change+1:end-Change-1,Change+1:end-Change);
