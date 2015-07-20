@@ -1,8 +1,8 @@
 clear;clc;
-addpath('C:\Users\jsherwoo\Desktop\MatlabProcessing\PreProcessImages')          % path of sub-functions etc.
-basepathS='C:\Users\jsherwoo\Desktop\MatlabProcessing\SampleCase\Raw\Str\';     % path for raw strobe images
-basepathL='C:\Users\jsherwoo\Desktop\MatlabProcessing\SampleCase\Raw\Las\';     % path for laser images
-writepath='C:\Users\jsherwoo\Desktop\MatlabProcessing\SampleCase\Processed';   % path to save processed data
+addpath('C:\Users\localadmin\Documents\MATLAB\PIV\PreProcessing\PreProcessImages')          % path of sub-functions etc.
+basepathS='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Str\';     % path for raw strobe images
+basepathL='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Las\';     % path for laser images
+writepath='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Processed';   % path to save processed data
 cd(basepathS)
 cases=struct2cell(dir);                             % get a list of the file names
 cases=cases(1,3:end);

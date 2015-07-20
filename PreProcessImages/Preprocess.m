@@ -1,12 +1,10 @@
-function[Columns,Rows,ImMeanFinal,Ga,Angle,Change,LasImMin]=Preprocess(basepathScase,filesS,basepathLcase,filesL)
+%function[Columns,Rows,ImMeanFinal,Ga,Angle,Change,LasImMin]=Preprocess(basepathScase,filesS,basepathLcase,filesL)
 %% get mean and std images from strobe
 Im=imread([basepathScase,char(filesS(1))]);     % read initial image for paramneters
-H=size(Im,1)/2;                                 % find height of single image
+H=size(Im,1);                                 % find height of single image
 for l=1:length(filesS)                           
     Im=single(imread([basepathScase,char(filesS(l))])-32768); % correct to 12 bit
-    ImA=Im(1:H,:);ImB=Im(H+1:end,:);                    % Split Image
-    ImStack(:,:,2*l-1)=ImA;                      % get dif image
-    ImStack(:,:,2*l)=ImB;  
+    ImStack(:,:,l)=Im;                      % get dif image
 end
 disp('Std image')
 ImStd=std(ImStack,[],3);
@@ -14,18 +12,18 @@ disp('Mean image')
 ImMean=mean(ImStack,3);
 clear ImStack
 %% get min image for laser
-for l=1:length(filesL)                          
-    Im=single(imread([basepathLcase,char(filesL(l))])-32768); % correct to 12 bit
-    ImA=Im(1:H,:);ImB=Im(H+1:end,:);                    % Split Image       
-    ImStack(:,:,2*l-1)=ImA;                      % get dif image
-    ImStack(:,:,2*l)=ImB;  
-end
-disp('Laser Min image')
-LasImMin=min(ImStack,[],3);
-clear ImStack
+% for l=1:length(filesL)                          
+%     Im=single(imread([basepathLcase,char(filesL(l))])-32768); % correct to 12 bit
+%     ImA=Im(1:H,:);ImB=Im(H+1:end,:);                    % Split Image       
+%     ImStack(:,:,2*l-1)=ImA;                      % get dif image
+%     ImStack(:,:,2*l)=ImB;  
+% end
+% disp('Laser Min image')
+% LasImMin=min(ImStack,[],3);
+% clear ImStack
 %% Fix Illumination for strobe images
 element=[ 0 1 0; 1 1 1; 0 1 0];                     % mask out the channel
-ImStdBW=im2bw(uint16(ImStd),100/(2^16));
+ImStdBW=im2bw(uint16(ImStd),5E-4);
 ImStdBWD=imdilate(ImStdBW,element);
 for i=1:4;ImStdBWD=imdilate(ImStdBWD,element);end   %
 disp('Fix Illumination')
