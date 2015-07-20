@@ -25,25 +25,27 @@ clear ImStack
 element=[ 0 1 0; 1 1 1; 0 1 0];                     % mask out the channel
 ImStdBW=im2bw(uint16(ImStd),5E-4);
 ImStdBWD=imdilate(ImStdBW,element);
-for i=1:4;ImStdBWD=imdilate(ImStdBWD,element);end   %
+for i=1:10;ImStdBWD=imdilate(ImStdBWD,element);end   %
 disp('Fix Illumination')
-Ga=FixStrobeIllumination(ImMean,ImStdBWD); 
+%Ga=FixStrobeIllumination(ImMean,ImStdBWD); 
 ImMeanF=ImMean./Ga;
 disp('Fix Location')
 %% Fix rotation
-ImStdBWE=imerode(ImStdBWD,element);
-for l=1:10;ImStdBWE=imerode(ImStdBWE,[1 1 1; 1 1 1; 1 1 1]);end
-ImStdLine=bwmorph(ImStdBWE,'skel',inf);     % Reduce to a line
-
-[~,LHS]=max(ImStdLine(:,64));               % get line centre on left side
-[~,RHS]=max(ImStdLine(:,1281));             % get line centre on left side
-
-Change=ceil(RHS-LHS);                       % find difference in long angle between sides
-Angle=atan2(Change,1216)*180/pi;            % calculate angle for rotation
+% ImStdBWE=imerode(ImStdBWD,element);
+% for l=1:20;ImStdBWE=imerode(ImStdBWE,[1 1 1; 1 1 1; 1 1 1]);end
+% ImStdLine=bwmorph(ImStdBWE,'skel',inf);     % Reduce to a line
+% 
+% [~,LHS]=max(ImStdLine(:,64));               % get line centre on left side
+% [~,RHS]=max(ImStdLine(:,1281));             % get line centre on left side
+% 
+% Change=ceil(RHS-LHS);                       % find difference in long angle between sides
+% Angle=atan2(Change,1216)*180/pi;            % calculate angle for rotation
+Angle=4.71;
+Change=tan(4.71/180*pi)*1024;
 Change=ceil(abs(Change))+3;                 % this is the amount extra added to the image which should be trimmed off
                                             % trims an extra 3 pixels for safety                
-ImMeanR=imrotate(ImMeanF,Angle,'bicubic');ImMeanR=ImMeanR(Change+1:end-Change,Change+1:end-Change);
-LasImMinR=imrotate(LasImMin,Angle,'bicubic');LasImMinR=LasImMinR(Change+1:end-Change,Change+1:end-Change);
+ImMeanR=imrotate(ImMeanF,Angle,'bicubic','crop');ImMeanR=ImMeanR(Change+1:end-Change,Change+1:end-Change);
+%LasImMinR=imrotate(LasImMin,Angle,'bicubic');LasImMinR=LasImMinR(Change+1:end-Change,Change+1:end-Change);
 %% find parent centre
 f=fspecial('prewitt');
 edge=imfilter(ImMeanR,f,'replicate');
