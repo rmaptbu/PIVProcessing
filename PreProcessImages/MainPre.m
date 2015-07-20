@@ -1,4 +1,4 @@
-clear;clc;
+% clear;clc;
 addpath('C:\Users\localadmin\Documents\MATLAB\PIV\PreProcessing\PreProcessImages')          % path of sub-functions etc.
 basepathS='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Str\';     % path for raw strobe images
 % basepathL='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Las\';     % path for laser images
@@ -6,7 +6,7 @@ writepath='C:\Users\localadmin\Documents\MATLAB\10muSpheres_400muTube\Processed'
 cd(basepathS)
 cases=struct2cell(dir);                             % get a list of the file names
 cases=cases(1,3:end);
-for i=1:length(cases)                               % for each case
+for i=1%:length(cases)                               % for each case
     disp(['Case ', num2str(i)])
     basepathScase=[basepathS,char(cases(i)),'\'];   % Build list of strobe images
     cd(basepathScase)
@@ -17,7 +17,7 @@ for i=1:length(cases)                               % for each case
 %     filesL=struct2cell(dir);
 %     filesL=filesL(1,3:end);
     disp('Locate and Mask')
-    [Columns,Rows,ImMeanF,Ga,Angle,Change]=Preprocess(basepathScase,filesS);
+%     [Columns,Rows,ImMeanF,Ga,Angle,Change]=Preprocess(basepathScase,filesS);
     disp('Write files')
     % save mean image
     if isdir([writepath,'\Mean\'])==0;mkdir([writepath,'\Mean\']);end
@@ -37,27 +37,26 @@ for i=1:length(cases)                               % for each case
 %         ImL=double(imread([basepathLcase,char(filesL(j))])-32768);
 %         H=size(ImS,1)/2; 
 %         ImSA=ImS(1:H,:);ImSB=ImS(H+1:end,:);                    % split images in two
-%         ImLA=ImL(1:H,:);ImLB=ImL(H+1:end,:); 
-        %% correct images
-        ImSA=ImSA./Ga;ImSB=ImSB./Ga;                % correct strobe for illumination
+%         ImLA=ImL(1:H,:);ImLB=ImL(H+1:end,:);
+             %% correct images
+        ImS=ImS./Ga;               % correct strobe for illumination
 %         ImLA=ImLA-LasImMin;ImLB=ImLB-LasImMin;      % subtract minimium imagefrom laser
         % rotate images, crop excess 
-        ImSA=imrotate(ImSA,Angle,'bicubic');ImSA=ImSA(Change+1:end-Change,Change+1:end-Change);
-        ImSB=imrotate(ImSB,Angle,'bicubic');ImSB=ImSB(Change+1:end-Change,Change+1:end-Change);
+        ImS=imrotate(ImS,Angle,'bicubic');ImS=ImS(Change+31:end-Change-31,Change+1:end-Change);
 %         ImLA=imrotate(ImLA,Angle,'bicubic');ImLA=ImLA(Change+1:end-Change,Change+1:end-Change);
 %         ImLB=imrotate(ImLB,Angle,'bicubic');ImLB=ImLB(Change+1:end-Change,Change+1:end-Change);
         %% Crop to region
-        ImSA=ImSA(Columns,Rows);ImSB=ImSB(Columns,Rows);
+        ImS=ImS(Columns,Rows);
 %         ImLA=ImLA(Columns,Rows);ImLB=ImLB(Columns,Rows);
         %% resize
-        ImSAr=imresize(ImSA,84/77);ImSBr=imresize(ImSB,84/77);
+        ImSr=imresize(ImS,84/77);
 %         ImLAr=imresize(ImLA,84/77);ImLBr=imresize(ImLB,84/77);
         
-        ImSwrite=fliplr([ImSAr;ImSBr]);
+        ImSwrite=fliplr([ImSr]);
 %         ImLwrite=fliplr([ImLAr;ImLBr]);
         
-        imwrite(uint16(ImLwrite),[WritePathL,char(filesL(j))]);
-%         imwrite(uint16(ImSwrite),[WritePathS,char(filesS(j))]);
+%         imwrite(uint16(ImLwrite),[WritePathL,char(filesL(j))]);
+        imwrite(uint16(ImSwrite),[WritePathS,char(filesS(j))]);
     end
 end
 
