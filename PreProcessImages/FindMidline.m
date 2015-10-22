@@ -28,7 +28,7 @@ function[mid,w]=FindMidline(prof)
 % w=R-L;
 
 %% corrected applied code
-[sizes,edges]=findpeaks(double(abs(prof)),'MINPEAKHEIGHT',1000,'MINPEAKDISTANCE',50);   % find left edge
+[sizes,edges]=findpeaks(double(abs(prof)),'MINPEAKHEIGHT',100,'MINPEAKDISTANCE',50);   % find left edge
 [m,I]=sort(sizes);              % put in order of size 
 lredges=edges(I(end-1:end));    % select two largest peaks
 
